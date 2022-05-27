@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/bm_aliyun_oss/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/bm_aliyun_oss/build" />
+      <excludeFolder url="file://$MODULE_DIR$/bm_aliyun_oss/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/bm_aliyun_oss/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/bm_aliyun_oss/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/bm_aliyun_oss/example/.dart_tool" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Dart SDK" level="project" />
+    <orderEntry type="library" name="Dart Packages" level="project" />
+  </component>
+</module>

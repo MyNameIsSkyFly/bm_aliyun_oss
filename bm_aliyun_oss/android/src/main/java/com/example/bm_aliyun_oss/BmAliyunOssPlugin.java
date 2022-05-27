@@ -17,6 +17,9 @@ import com.alibaba.sdk.android.oss.model.GetObjectResult;
 import com.alibaba.sdk.android.oss.model.PutObjectRequest;
 import com.alibaba.sdk.android.oss.model.PutObjectResult;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -47,19 +50,35 @@ public class BmAliyunOssPlugin implements FlutterPlugin, MethodCallHandler {
                 result.success(true);
                 break;
             case "upload":
-                Map<String, String> map2 = (Map<String, String>) call.arguments;
-                PutObjectRequest put = new PutObjectRequest(map2.get("bucketName"), map2.get("objectKey"), map2.get("filePath"));
-                oss.asyncPutObject(put, new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
-                    @Override
-                    public void onSuccess(PutObjectRequest request, PutObjectResult putObjectResult) {
-                        result.success(request.getObjectKey());
-                    }
+                Map<String, Object> map2 = (Map<String, Object>) call.arguments;
+                if (map2.get("filePath") != null) {
+                    PutObjectRequest put = new PutObjectRequest((String) map2.get("bucketName"), (String) map2.get("objectKey"), (String) map2.get("filePath"));
+                    oss.asyncPutObject(put, new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
+                        @Override
+                        public void onSuccess(PutObjectRequest request, PutObjectResult putObjectResult) {
+                            result.success(request.getObjectKey());
+                        }
 
-                    @Override
-                    public void onFailure(PutObjectRequest request, ClientException clientExcepion, ServiceException serviceException) {
-                        result.error("-1", "上传文件错误", null);
-                    }
-                });
+                        @Override
+                        public void onFailure(PutObjectRequest request, ClientException clientExcepion, ServiceException serviceException) {
+                            result.error("-1", "上传文件错误", null);
+                        }
+                    });
+                } else if (map2.get("data") != null) {
+                    PutObjectRequest put = new PutObjectRequest((String) map2.get("bucketName"), (String) map2.get("objectKey"), (byte[]) map2.get("data"));
+                    oss.asyncPutObject(put, new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
+                        @Override
+                        public void onSuccess(PutObjectRequest request, PutObjectResult putObjectResult) {
+                            result.success(request.getObjectKey());
+                        }
+
+                        @Override
+                        public void onFailure(PutObjectRequest request, ClientException clientExcepion, ServiceException serviceException) {
+                            result.error("-1", "上传文件错误", null);
+                        }
+                    });
+                }
+
                 break;
             case "download":
                 Map<String, String> map3 = (Map<String, String>) call.arguments;
@@ -67,7 +86,11 @@ public class BmAliyunOssPlugin implements FlutterPlugin, MethodCallHandler {
                 oss.asyncGetObject(get, new OSSCompletedCallback<GetObjectRequest, GetObjectResult>() {
                     @Override
                     public void onSuccess(GetObjectRequest request, GetObjectResult getObjectResult) {
-                        result.success(getObjectResult.getObjectContent());
+                        try {
+                            result.success(toByteArray(getObjectResult.getObjectContent()));
+                        } catch (IOException e) {
+                            result.error("-1", "下载文件错误", null);
+                        }
                     }
 
                     @Override
@@ -86,5 +109,15 @@ public class BmAliyunOssPlugin implements FlutterPlugin, MethodCallHandler {
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         channel.setMethodCallHandler(null);
         oss = null;
+    }
+
+    private static byte[] toByteArray(InputStream input) throws IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024 * 4];
+        int n = 0;
+        while (-1 != (n = input.read(buffer))) {
+            output.write(buffer, 0, n);
+        }
+        return output.toByteArray();
     }
 }

@@ -46,7 +46,6 @@ public class SwiftBmAliyunOssPlugin: NSObject, FlutterPlugin {
             credential = OSSStsTokenCredentialProvider(accessKeyId: accessKeyId, secretKeyId: secretKeyId, securityToken: securityToken!)
         }
         client = OSSClient(endpoint: endpoint, credentialProvider: credential)
-        print("初始化成功")
 
     }
 
@@ -54,18 +53,18 @@ public class SwiftBmAliyunOssPlugin: NSObject, FlutterPlugin {
         let params = call.arguments as! [String: Any?]
         let bucketName = params["bucketName"] as! String
         let objectKey = params["objectKey"] as! String
-        let filePath = params["filePath"] as! String
+        let filePath = params["filePath"] as? String
+        let data = params["data"] as? FlutterStandardTypedData
 
         let request = OSSPutObjectRequest()
         request.bucketName = bucketName
         request.objectKey = objectKey //文件完整路径
-        request.uploadingFileURL = URL.init(fileURLWithPath: filePath)
-        request.uploadProgress = {(bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) in
-            self.uploadProgressCallback(
-                objectKey: request.objectKey,
-                bytesSent: bytesSent,
-                totalBytesSent: totalBytesSent,
-                totalBytesExpectedToSend: totalBytesExpectedToSend)
+        if(filePath != nil) {
+            request.uploadingFileURL = URL.init(fileURLWithPath: filePath!)
+        }
+
+        if(data != nil){
+            request.uploadingData = data!.data
         }
 
         let task = client.putObject(request)
@@ -84,13 +83,6 @@ public class SwiftBmAliyunOssPlugin: NSObject, FlutterPlugin {
         let request = OSSGetObjectRequest()
         request.bucketName = bucketName
         request.objectKey = objectKey //文件完整路径
-        request.downloadProgress = {(bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) in
-            self.downloadProgressCallback(
-                objectKey: request.objectKey,
-                bytesSent: bytesSent,
-                totalBytesSent: totalBytesSent,
-                totalBytesExpectedToSend: totalBytesExpectedToSend)
-        }
 
         let task = client.getObject(request)
         task.continue ({ t in
@@ -130,11 +122,12 @@ public class SwiftBmAliyunOssPlugin: NSObject, FlutterPlugin {
 
       if (task?.error != nil) {
         let error: NSError = (task?.error)! as NSError
-        uploadFailCallback(objectKey: objectKey, error: error)
+        print(error)
+//         uploadFailCallback(objectKey: objectKey, error: error)
         result("")
       } else {
         let taskResult = task?.result
-        uploadSuccessCallback(objectKey: objectKey)
+//         uploadSuccessCallback(objectKey: objectKey)
         result(objectKey)
       }
     }
@@ -154,14 +147,15 @@ public class SwiftBmAliyunOssPlugin: NSObject, FlutterPlugin {
     }
 
     func showDownload(task: OSSTask<AnyObject>?, objectKey: String,result: @escaping FlutterResult) -> Void {
+
       if (task?.error != nil) {
         let error: NSError = (task?.error)! as NSError
-          downloadFailCallback(objectKey: objectKey, error: error)
+//           downloadFailCallback(objectKey: objectKey, error: error)
           result(nil)
 
       } else {
           let taskResult = task?.result
-          downloadSuccessCallback(objectKey: objectKey,result: taskResult)
+//           downloadSuccessCallback(objectKey: objectKey,result: taskResult)
           let resultObject = taskResult as! OSSGetObjectResult
           result(FlutterStandardTypedData(bytes: resultObject.downloadedData))
       }
