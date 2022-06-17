@@ -53,4 +53,11 @@ class BmAliyunOss extends PlatformInterface {
   }) {
     throw UnimplementedError('download() has not been implemented.');
   }
+
+  Future<dynamic> url({
+    String? bucketName,
+    required String objectKey,
+  }) {
+    throw UnimplementedError('url() has not been implemented.');
+  }
 }

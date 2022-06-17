@@ -66,4 +66,18 @@ class MethodChannelAliyunOSS extends BmAliyunOss {
     );
   }
 
+  @override
+  Future<dynamic> url({
+    String? bucketName,
+    required String objectKey,
+  }) async {
+    return _methodChannel.invokeMethod(
+      'getTemp',
+      {
+        "bucketName": bucketName,
+        'objectKey': objectKey,
+      },
+    );
+  }
+
 }

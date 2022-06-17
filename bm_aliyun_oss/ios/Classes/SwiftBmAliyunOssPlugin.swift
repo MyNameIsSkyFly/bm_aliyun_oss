@@ -27,6 +27,8 @@ public class SwiftBmAliyunOssPlugin: NSObject, FlutterPlugin {
             upload(call,result)
         case "download":
             download(call,result)
+        case "getTemp":
+            getUrl(call,result)
         default:
             break
         }
@@ -90,6 +92,25 @@ public class SwiftBmAliyunOssPlugin: NSObject, FlutterPlugin {
         })
 
     }
+    
+    func getUrl(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        let params = call.arguments as! [String: Any?]
+        let bucketName = params["bucketName"] as! String
+        let objectKey = params["objectKey"] as! String
+
+        let request = OSSGetObjectRequest()
+        request.bucketName = bucketName
+        request.objectKey = objectKey //文件完整路径
+
+        let task = client.presignConstrainURL(withBucketName: bucketName, withObjectKey: objectKey, withExpirationInterval: 60*30)
+        if(task.error != nil){
+            result(nil);
+        } else {
+            result(task.result);
+        }
+
+    }
+
 
 
 
