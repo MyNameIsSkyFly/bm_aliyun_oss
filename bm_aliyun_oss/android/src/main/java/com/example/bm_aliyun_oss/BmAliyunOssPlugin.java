@@ -102,7 +102,7 @@ public class BmAliyunOssPlugin implements FlutterPlugin, MethodCallHandler {
             case "getTemp":
                 Map<String, String> map4 = (Map<String, String>) call.arguments;
                 try {
-                    String url = oss.presignConstrainedObjectURL(map4.get("bucketName"), map4.get("objectKey"), 30 * 60);
+                    String url = oss.presignConstrainedObjectURL(map4.get("bucketName"), map4.get("objectKey"), 60 * 60 * 24 * 7);
                     result.success(url);
                 } catch (ClientException e) {
                     result.error("-1", "获取临时链接错误", null);

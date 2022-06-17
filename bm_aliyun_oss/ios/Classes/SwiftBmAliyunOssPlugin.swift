@@ -102,7 +102,7 @@ public class SwiftBmAliyunOssPlugin: NSObject, FlutterPlugin {
         request.bucketName = bucketName
         request.objectKey = objectKey //文件完整路径
 
-        let task = client.presignConstrainURL(withBucketName: bucketName, withObjectKey: objectKey, withExpirationInterval: 60*30)
+        let task = client.presignConstrainURL(withBucketName: bucketName, withObjectKey: objectKey, withExpirationInterval: 60 * 60 * 24 * 7)
         if(task.error != nil){
             result(nil);
         } else {
