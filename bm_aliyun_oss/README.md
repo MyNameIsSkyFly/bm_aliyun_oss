@@ -1,6 +1,6 @@
 # bm_aliyun_oss
 
-A new Flutter project.
+bm_aliyun_oss
 
 ## Getting Started
 
